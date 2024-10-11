@@ -1,0 +1,19 @@
+name: CI Pipeline
+
+# Chạy workflow khi có sự kiện push hoặc pull request
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Sử dụng môi trường Ubuntu
+
+    steps:
+      # Bước 1: Check out mã nguồn
+      - name: Checkout code
+        uses: actions/checkout@v3
