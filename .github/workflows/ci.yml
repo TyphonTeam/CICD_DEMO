@@ -55,7 +55,7 @@ jobs:
         docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/cicd_webapplication:latest
         docker stop cicd_webapplication || true
         docker rm cicd_webapplication || true
-        docker run -d --name cicd_webapplication -p 106:80 garydipprey/cicd_webapplication:latest
+        docker run -d --name cicd_webapplication -p 106:80 ${{ secrets.DOCKER_HUB_USERNAME }}/cicd_webapplication:latest
         EOF
 
 
