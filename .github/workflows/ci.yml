@@ -45,14 +45,16 @@ jobs:
 
     # Pull image from Docker Hub on remote server and start container
     - name: Deploy to Docker Server
+      env:
+        DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+        DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}x
+        CONTAINER_NAME: cicd_webapplication
       run: |
         ssh -o StrictHostKeyChecking=no hnxadmin@${{ secrets.DOCKER_SERVER }} << 'EOF'
         docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/cicd_webapplication:latest
-        docker stop your-container || true
-        docker rm your-container || true
-        docker run -d --name your-container -p 80:80 ${{ secrets.DOCKER_HUB_USERNAME }}/cicd_webapplication:latest
+        docker stop $CONTAINER_NAME || true
+        docker rm $CONTAINER_NAME || true
+        docker run -d --name $CONTAINER_NAME -p 106:80 ${{ secrets.DOCKER_HUB_USERNAME }}/$CONTAINER_NAME:latest
         EOF
-      env:
-        DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-        DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
 
