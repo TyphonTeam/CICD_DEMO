@@ -42,11 +42,11 @@ jobs:
     - name: Build Docker image
       run: |
        BUILD_NUMBER=${{ github.run_number }}
-       docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.CONTAINER_NAME_DEMO }}:latest .
+       docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.CONTAINER_NAME_DEMO }}:${{ env.BUILD_NUMBER }} .
        
     # Push the Docker image to Docker Hub
     - name: Push Docker image
-      run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.CONTAINER_NAME_DEMO }}:latest
+      run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.CONTAINER_NAME_DEMO }}:${{ env.BUILD_NUMBER }}
 
     # Set up SSH to connect to Docker server
     - name: Thiết lập SSH
@@ -63,10 +63,10 @@ jobs:
         REPOSITORY_NAME: garydipprey
       run: |
         ssh -o StrictHostKeyChecking=no hnxadmin@${{ secrets.DOCKER_SERVER }} << 'EOF'
-        docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.CONTAINER_NAME_DEMO }}:latest
+        docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.CONTAINER_NAME_DEMO }}:${{ env.BUILD_NUMBER }}
         docker stop ${{ secrets.CONTAINER_NAME_DEMO }} || true
         docker rm ${{ secrets.CONTAINER_NAME_DEMO }} || true
-        docker run -d --name ${{ secrets.CONTAINER_NAME_DEMO }} -p 106:80 ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.CONTAINER_NAME_DEMO }}:latest
+        docker run -d --name ${{ secrets.CONTAINER_NAME_DEMO }} -p 106:80 ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.CONTAINER_NAME_DEMO }}:${{ env.BUILD_NUMBER }}
         EOF
 
 
