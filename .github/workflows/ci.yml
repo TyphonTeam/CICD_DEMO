@@ -47,15 +47,15 @@ jobs:
     - name: Deploy to Docker Server
       env:
         DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-        DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}x
+        DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
         CONTAINER_NAME: cicd_webapplication
         REPOSITORY_NAME: garydipprey
       run: |
         ssh -o StrictHostKeyChecking=no hnxadmin@${{ secrets.DOCKER_SERVER }} << 'EOF'
         docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/cicd_webapplication:latest
-        docker stop $CONTAINER_NAME || true
-        docker rm $CONTAINER_NAME || true
-        docker run -d --name $CONTAINER_NAME -p 106:80 $REPOSITORY_NAME/$CONTAINER_NAME:latest
+        docker stop cicd_webapplication || true
+        docker rm cicd_webapplication || true
+        docker run -d --name cicd_webapplication -p 106:80 $REPOSITORY_NAME/$CONTAINER_NAME:latest
         EOF
 
 
