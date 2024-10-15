@@ -39,7 +39,7 @@ jobs:
 
     # Set up SSH to connect to Docker server
     - name: Set up SSH
-      uses: webfactory/ssh-agent@v0.10.1
+      uses: webfactory/ssh-agent@v0.10.3
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
