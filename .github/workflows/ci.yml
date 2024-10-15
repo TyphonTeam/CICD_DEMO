@@ -55,7 +55,7 @@ jobs:
         docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/cicd_webapplication:latest
         docker stop $CONTAINER_NAME || true
         docker rm $CONTAINER_NAME || true
-        docker run -d --name $CONTAINER_NAME -p 106:80 ${{ secrets.DOCKER_HUB_USERNAME }}/$REPOSITORY_NAME:latest
+        docker run -d --name $CONTAINER_NAME -p 106:80 $REPOSITORY_NAME/$CONTAINER_NAME:latest
         EOF
 
 
