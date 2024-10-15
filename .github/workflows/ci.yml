@@ -4,69 +4,61 @@ name: CI Pipeline
 on:
   push:
     branches:
-    - main
+      - main
   pull_request:
     branches:
-    - main
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest # Sử dụng môi trường Ubuntu
 
     steps:
-    # Bước 1: Check out mã nguồn
-    - name: Checkout code
-      uses: actions/checkout@v3
+      # Bước 1: Check out mã nguồn
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    # Setup Docker
-    - name: Setup Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      # Setup Docker
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v2
       
+      # Log in to Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }} # Định nghĩa secrets này trong repo GitHub của bạn
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-    # Log in to Docker Hub
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_HUB_USERNAME }} # Define these secrets in your GitHub repo
-        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      # Set Build Number
+      - name: Set build number
+        run: echo "BUILD_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
 
-    # Set Build Number
-    - name: Set build number
-      run:  echo "BUILD_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
+      # Check Build Number value
+      - name: Check Build Number
+        run: echo $BUILD_NUMBER  
 
-    # Check Build Number value
-    - name: Check Build Number
-      run: echo $BUILD_NUMBER  
+      # Build the Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.CONTAINER_NAME_DEMO }}:$BUILD_NUMBER .
 
-    # Build the Docker image
-    - name: Build Docker image
-      run: |
-       BUILD_NUMBER=${{ github.run_number }}
-       docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.CONTAINER_NAME_DEMO }}:$BUILD_NUMBER .
-       
-    # Push the Docker image to Docker Hub
-    - name: Push Docker image
-      run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.CONTAINER_NAME_DEMO }}:$BUILD_NUMBER
+      # Push the Docker image to Docker Hub
+      - name: Push Docker image
+        run: |
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.CONTAINER_NAME_DEMO }}:$BUILD_NUMBER
 
-    # Set up SSH to connect to Docker server
-    - name: Thiết lập SSH
-      uses: webfactory/ssh-agent@v0.9.0
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      # Set up SSH to connect to Docker server
+      - name: Thiết lập SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    # Pull image from Docker Hub on remote server and start container
-    - name: Deploy to Docker Server
-      env:
-        DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-        DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-        CONTAINER_NAME: ${{ secrets.CONTAINER_NAME_DEMO }}
-        REPOSITORY_NAME: garydipprey
-      run: |
-        ssh -o StrictHostKeyChecking=no hnxadmin@${{ secrets.DOCKER_SERVER }} << 'EOF'
-        docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.CONTAINER_NAME_DEMO }}:$BUILD_NUMBER
-      # docker stop ${{ secrets.CONTAINER_NAME_DEMO }} || true
-      # docker rm ${{ secrets.CONTAINER_NAME_DEMO }} || true
-      # docker run -d --name ${{ secrets.CONTAINER_NAME_DEMO }} -p 106:80 ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.CONTAINER_NAME_DEMO }}:$BUILD_NUMBER
-      # EOF
-
-
+      # Pull image from Docker Hub on remote server and start container
+      - name: Deploy to Docker Server
+        run: |
+          ssh -o StrictHostKeyChecking=no hnxadmin@${{ secrets.DOCKER_SERVER }} << 'EOF'
+          docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.CONTAINER_NAME_DEMO }}:$BUILD_NUMBER
+          docker stop ${{ secrets.CONTAINER_NAME_DEMO }} || true
+          docker rm ${{ secrets.CONTAINER_NAME_DEMO }} || true
+          docker run -d --name ${{ secrets.CONTAINER_NAME_DEMO }} -p 106:80 ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.CONTAINER_NAME_DEMO }}:$BUILD_NUMBER
+          EOF
