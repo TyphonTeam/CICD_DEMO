@@ -29,3 +29,11 @@ jobs:
         username: ${{ secrets.DOCKER_HUB_USERNAME }} # Define these secrets in your GitHub repo
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
+    # Build the Docker image
+    - name: Build Docker image
+      run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/cicd_webapplication:latest .
+
+    # Push the Docker image to Docker Hub
+    - name: Push Docker image
+      run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/cicd_webapplication:latest
+
