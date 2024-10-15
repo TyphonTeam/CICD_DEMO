@@ -37,3 +37,9 @@ jobs:
     - name: Push Docker image
       run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/cicd_webapplication:latest
 
+    # Set up SSH to connect to Docker server
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.10.1
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
