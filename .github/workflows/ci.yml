@@ -66,6 +66,13 @@ jobs:
         docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.CONTAINER_NAME_DEMO }}:${{ env.BUILD_NUMBER }}
         docker stop ${{ secrets.CONTAINER_NAME_DEMO }} || true
         docker rm ${{ secrets.CONTAINER_NAME_DEMO }} || true
+
+        while [ "$(docker ps -a -q -f name=${{ secrets.CONTAINER_NAME_DEMO }})" ]; do
+          echo "Container vẫn tồn tại. Đang chờ xóa..."
+          sleep 1
+          docker rm -f ${{ secrets.CONTAINER_NAME_DEMO }} || true
+        done
+        
         docker run -d --name ${{ secrets.CONTAINER_NAME_DEMO }} -p 106:80 ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.CONTAINER_NAME_DEMO }}:${{ env.BUILD_NUMBER }}
         EOF
 
