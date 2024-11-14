@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest # Sử dụng môi trường Ubuntu
+    runs-on: self-hosted # Sử dụng môi trường Ubuntu
 
     steps:
     # Bước 1: Check out mã nguồn
